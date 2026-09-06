@@ -1,0 +1,197 @@
+---
+const pathname = new URL(Astro.request.url).pathname;
+const currentPath = pathname.replace(/\/$/, ""); // Remove trailing slash for exact matches
+
+const navItems = [
+  { href: "/", label: "Gallery" },
+  { href: "/blog", label: "Blog" },
+  { href: "/about", label: "About" },
+];
+---
+
+<header class="site-header">
+  <div class="nav-container">
+    <a href="/" class="brand-logo">Snaps by Dave</a>
+
+    <!-- Mobile Hamburger Toggle Button -->
+    <button
+      id="menu-toggle"
+      class="menu-toggle"
+      aria-label="Toggle Navigation Menu"
+      aria-expanded="false"
+      aria-controls="primary-nav"
+    >
+      <span class="bar"></span>
+      <span class="bar"></span>
+      <span class="bar"></span>
+    </button>
+
+    <!-- Navigation Links -->
+    <nav id="primary-nav" class="nav-menu">
+      <ul>
+        {
+          navItems.map((item) => {
+            const isActive =
+              item.href === "/"
+                ? currentPath === ""
+                : currentPath.startsWith(item.href);
+
+            return (
+              <li>
+                <a
+                  href={item.href}
+                  class:list={[{ active: isActive }]}
+                  aria-current={isActive ? "page" : undefined}
+                >
+                  {item.label}
+                </a>
+              </li>
+            );
+          })
+        }
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<style>
+  .site-header {
+    background-color: var(--bg, #0f0f11);
+    border-bottom: 1px solid #27272a;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    width: 100%;
+  }
+
+  .nav-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1rem 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .brand-logo {
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 1.25rem;
+    text-decoration: none;
+    letter-spacing: -0.02em;
+  }
+
+  /* Navigation Links */
+  .nav-menu ul {
+    display: flex;
+    gap: 2rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .nav-menu a {
+    color: var(--text-muted, #a1a1aa);
+    text-decoration: none;
+    font-size: 0.95rem;
+    font-weight: 500;
+    transition: color 0.15s ease;
+  }
+
+  .nav-menu a:hover,
+  .nav-menu a.active {
+    color: #ffffff;
+  }
+
+  /* Mobile Toggle Button */
+  .menu-toggle {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+    flex: 0 0 32px;
+    width: 32px;
+    height: 32px;
+    background: transparent;
+    border: 1px solid #52525b;
+    border-radius: 4px;
+    cursor: pointer;
+    padding: 0;
+    position: relative;
+    z-index: 1;
+  }
+
+  .menu-toggle .bar {
+    display: block;
+    flex: 0 0 3px;
+    width: 20px;
+    height: 3px;
+    background-color: #ffffff !important;
+    border: 1px solid #ffffff !important;
+    border-radius: 2px;
+    filter: none !important;
+    opacity: 1 !important;
+    transition: all 0.25s ease-in-out;
+  }
+
+  /* --- Mobile Responsive Layout --- */
+  @media (max-width: 768px) {
+    .menu-toggle {
+      display: flex;
+    }
+
+    .nav-menu {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: 100%;
+      background-color: var(--bg, #0f0f11);
+      border-bottom: 1px solid #27272a;
+      padding: 1.5rem 0;
+    }
+
+    .nav-menu.is-open {
+      display: block;
+    }
+
+    .nav-menu ul {
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    /* Animated Hamburger to "X" Icon */
+    .menu-toggle.is-open .bar:nth-child(1) {
+      transform: translateY(8px) rotate(45deg);
+    }
+    .menu-toggle.is-open .bar:nth-child(2) {
+      opacity: 0;
+    }
+    .menu-toggle.is-open .bar:nth-child(3) {
+      transform: translateY(-8px) rotate(-45deg);
+    }
+  }
+</style>
+
+<script>
+  function setupNavigation() {
+    const toggleBtn = document.getElementById("menu-toggle");
+    const navMenu = document.getElementById("primary-nav");
+
+    if (toggleBtn && navMenu) {
+      toggleBtn.addEventListener("click", () => {
+        const isOpen = navMenu.classList.toggle("is-open");
+        toggleBtn.classList.toggle("is-open");
+        toggleBtn.setAttribute("aria-expanded", isOpen ? "true" : "false");
+      });
+    }
+  }
+
+  // Initialize on page load
+  setupNavigation();
+
+  // Re-run setup if using Astro View Transitions
+  document.addEventListener("astro:page-load", setupNavigation);
+</script>

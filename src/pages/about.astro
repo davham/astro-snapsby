@@ -1,0 +1,62 @@
+---
+import Navigation from '../components/Navigation.astro';
+import '../styles/global.css';
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>About — Snaps by Dave</title>
+  </head>
+  <body>
+    <Navigation />
+
+    <main class="about-container">
+      <h1>About</h1>
+      <p class="intro">
+        Welcome to my photo journal. This site serves as a personal collection of images, experiments, and field notes without algorithms or commercial noise.
+      </p>
+
+      <section class="about-section">
+        <h2>Gear & Process</h2>
+        <p>
+          I focus mostly on street, urban texture, and quiet landscape moments—shooting primarily with compact digital and analog rangefinder setups.
+        </p>
+      </section>
+    </main>
+  </body>
+</html>
+
+<style>
+  .about-container {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 3rem 1.5rem 6rem 1.5rem;
+    color: var(--text, #e4e4e7);
+  }
+
+  h1 {
+    font-size: 2.5rem;
+    margin-bottom: 1.5rem;
+    letter-spacing: -0.02em;
+  }
+
+  .intro {
+    font-size: 1.2rem;
+    line-height: 1.6;
+    color: var(--text-muted, #a1a1aa);
+    margin-bottom: 2.5rem;
+  }
+
+  .about-section h2 {
+    font-size: 1.3rem;
+    margin-bottom: 0.75rem;
+    color: #ffffff;
+  }
+
+  .about-section p {
+    line-height: 1.7;
+    color: var(--text-muted, #a1a1aa);
+  }
+</style>
