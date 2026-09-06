@@ -1,47 +1,81 @@
 ---
 import Navigation from '../components/Navigation.astro';
 import { Image } from 'astro:assets';
-import { getCollection } from 'astro:content';
+import { getCollection, render } from 'astro:content';
 import '../styles/global.css';
 
 const gallery = await getCollection('gallery');
 gallery.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+const photos = await Promise.all(
+  gallery.map(async (photo) => ({
+    photo,
+    Content: (await render(photo)).Content,
+  })),
+);
 ---
 
 <html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/glightbox/dist/css/glightbox.min.css" />
     <title>Snaps by Dave</title>
   </head>
   <body>
     <Navigation />
     
-    <main>
+  
       <header class="header">
         <h1>Gallery</h1>
         <p>Recent photographs from the road, the woods, and everywhere in between.</p>
       </header>
 
-      <section class="gallery-grid" aria-label="Photo gallery">
-        {gallery.map((photo) => (
+      <main class="gallery-grid">
+      {photos.map(({ photo, Content }) => {
+        const captionText = `${photo.data.title} ${photo.data.exif?.settings ? `— ${photo.data.exif.settings}` : ''}`;
+        
+        return (
           <article class="photo-card">
-            <Image
-              class="thumbnail"
-              src={photo.data.cover}
-              alt={photo.data.alt}
-              widths={[600, 900]}
-              sizes="(max-width: 700px) 100vw, 50vw"
-            />
+            <a 
+              href={photo.data.cover.src} 
+              class="glightbox" 
+              data-gallery="portfolio"
+              data-title={photo.data.title}
+              data-description={captionText}
+            >
+              <Image 
+                src={photo.data.cover} 
+                alt={photo.data.alt} 
+                width={800} 
+                format="webp" 
+                class="thumbnail"
+              />
+            </a>
+            
             <div class="meta">
               <h2>{photo.data.title}</h2>
-              <p class="exif">
-                {photo.data.exif?.camera ?? 'Camera'} · {photo.data.date.toLocaleDateString()}
-              </p>
+              {photo.data.exif && (
+                <p class="exif">
+                  {photo.data.exif.camera} • {photo.data.exif.settings}
+                </p>
+              )}
+              <div class="description">
+                <Content />
+              </div>
             </div>
           </article>
-        ))}
-      </section>
+        );
+      })}
     </main>
+
+    <script is:inline src="https://cdn.jsdelivr.net/npm/glightbox/dist/js/glightbox.min.js"></script>
+    <script is:inline>
+      const lightbox = GLightbox({
+        selector: '.glightbox',
+        touchNavigation: true,
+        loop: true,
+        zoomable: true
+      });
+    </script>
   </body>
 </html>
